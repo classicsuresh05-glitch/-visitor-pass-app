@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}About Us — VisitorPass Pro{% endblock %}
+{% block content %}
+
+<section class="page-hero">
+  <div class="page-hero-bg">
+    <div class="ph-orb ph-orb1"></div><div class="ph-orb ph-orb2"></div>
+  </div>
+  <div class="page-hero-content">
+    <div class="section-tag">Who We Are</div>
+    <h1>Redefining Visitor Management</h1>
+    <p>We build technology that makes every visit smoother, safer and smarter.</p>
+  </div>
+</section>
+
+<section class="about-mission section-pad">
+  <div class="container two-col">
+    <div class="about-text reveal">
+      <div class="section-tag">Our Mission</div>
+      <h2>Paperless. Seamless. Professional.</h2>
+      <p>VisitorPass Pro was founded with a simple goal — to eliminate the paperwork, queues and confusion that plague visitor management at organisations of every size.</p>
+      <p>From corporate campuses and tech parks to hospitals and educational institutions, our platform gives visitors a smooth, digital experience from the moment they book a pass to the moment they walk through the gate.</p>
+      <div class="about-values">
+        <div class="av-item"><i class="fa fa-shield-halved"></i><span>Security First</span></div>
+        <div class="av-item"><i class="fa fa-bolt"></i><span>Instant Processing</span></div>
+        <div class="av-item"><i class="fa fa-leaf"></i><span>Go Green</span></div>
+        <div class="av-item"><i class="fa fa-headset"></i><span>24/7 Support</span></div>
+      </div>
+    </div>
+    <div class="about-visual reveal">
+      <div class="about-card-stack">
+        <div class="about-metric-card">
+          <i class="fa fa-users"></i>
+          <h3>10,000+</h3>
+          <p>Visitors Served</p>
+        </div>
+        <div class="about-metric-card accent">
+          <i class="fa fa-building"></i>
+          <h3>150+</h3>
+          <p>Organisations</p>
+        </div>
+        <div class="about-metric-card">
+          <i class="fa fa-star"></i>
+          <h3>4.9 / 5</h3>
+          <p>Avg. Satisfaction</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="team-section section-pad dark-bg">
+  <div class="container">
+    <div class="section-header light">
+      <div class="section-tag">Our Team</div>
+      <h2>The People Behind the Platform</h2>
+    </div>
+    <div class="team-grid">
+      {% set team = [
+        ('fa-user-tie','Priya Sharma','Founder & CEO','Building world-class visitor experiences.','fa-linkedin'),
+        ('fa-user-gear','Karthik Rajan','CTO','Engineering secure and scalable systems.','fa-github'),
+        ('fa-user-pen','Meena Iyer','Head of Design','Crafting beautiful and intuitive interfaces.','fa-dribbble'),
+        ('fa-user-shield','Vijay Kumar','Security Lead','Keeping visitor data safe around the clock.','fa-twitter'),
+      ] %}
+      {% for icon, name, role, quote, social in team %}
+      <div class="team-card">
+        <div class="team-avatar"><i class="fa {{ icon }}"></i></div>
+        <h3>{{ name }}</h3>
+        <span class="team-role">{{ role }}</span>
+        <p>{{ quote }}</p>
+        <a href="#" class="team-social"><i class="fa-brands {{ social }}"></i></a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="timeline-section section-pad">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">Our Journey</div>
+      <h2>Milestones That Matter</h2>
+    </div>
+    <div class="timeline">
+      {% set milestones = [
+        ('2020','Founded','Started as a small team with a big vision — make visitor management digital.'),
+        ('2021','First 1000 Users','Reached our first milestone with users across Tamil Nadu.'),
+        ('2022','Mobile Ready','Launched full mobile-responsive platform with QR code support.'),
+        ('2023','Corporate Clients','Partnered with 50+ IT parks and corporate campuses.'),
+        ('2024','National Expansion','Expanded to 10 states with over 10,000 active users.'),
+      ] %}
+      {% for year, title, desc in milestones %}
+      <div class="tl-item">
+        <div class="tl-year">{{ year }}</div>
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <h3>{{ title }}</h3>
+          <p>{{ desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — VisitorPass Pro{% endblock %}
+{% block content %}
+
+<section class="dash-section">
+  <div class="dash-sidebar">
+    <div class="ds-user">
+      <div class="ds-avatar"><i class="fa fa-user"></i></div>
+      <h3>{{ user.name }}</h3>
+      <span class="ds-role">{{ user.role|capitalize }}</span>
+    </div>
+    <nav class="ds-nav">
+      <a href="{{ url_for('dashboard') }}" class="ds-link active"><i class="fa fa-grid-2"></i> Dashboard</a>
+      <a href="{{ url_for('booking') }}"   class="ds-link"><i class="fa fa-plus-circle"></i> New Booking</a>
+      <a href="{{ url_for('packages') }}"  class="ds-link"><i class="fa fa-box-open"></i> Packages</a>
+      <a href="{{ url_for('contact') }}"   class="ds-link"><i class="fa fa-headset"></i> Support</a>
+      <a href="{{ url_for('logout') }}"    class="ds-link logout"><i class="fa fa-right-from-bracket"></i> Logout</a>
+    </nav>
+  </div>
+
+  <div class="dash-main">
+    <div class="dash-top">
+      <div>
+        <h1>Welcome back, {{ user.name.split()[0] }}!</h1>
+        <p>Here's an overview of your visitor passes.</p>
+      </div>
+      <a href="{{ url_for('booking') }}" class="btn-solid">+ New Pass</a>
+    </div>
+
+    <!-- KPIs -->
+    <div class="dash-kpi-grid">
+      {% set total    = bookings|length %}
+      {% set approved = bookings|selectattr('status','equalto','approved')|list|length %}
+      {% set pending  = bookings|selectattr('status','equalto','pending')|list|length %}
+      {% set spent    = bookings|sum(attribute='total_amount') %}
+      <div class="kpi-card">
+        <div class="kpi-icon blue"><i class="fa fa-ticket"></i></div>
+        <div class="kpi-info"><h2>{{ total }}</h2><p>Total Bookings</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon green"><i class="fa fa-circle-check"></i></div>
+        <div class="kpi-info"><h2>{{ approved }}</h2><p>Approved Passes</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon amber"><i class="fa fa-hourglass-half"></i></div>
+        <div class="kpi-info"><h2>{{ pending }}</h2><p>Pending</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple"><i class="fa fa-indian-rupee-sign"></i></div>
+        <div class="kpi-info"><h2>₹{{ spent|int }}</h2><p>Total Spent</p></div>
+      </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="dash-card">
+      <div class="dc-header">
+        <h2><i class="fa fa-list-check"></i> My Passes</h2>
+        <a href="{{ url_for('booking') }}" class="dc-action">+ Book New Pass</a>
+      </div>
+      {% if bookings %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Pass Code</th><th>Package</th><th>Visit Date</th>
+              <th>Visitors</th><th>Amount</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in bookings %}
+            <tr>
+              <td><span class="pass-code-badge">{{ b.pass_code }}</span></td>
+              <td>{{ b.package.name }}</td>
+              <td>{{ b.visit_date.strftime('%d %b %Y') }}</td>
+              <td>{{ b.num_visitors }}</td>
+              <td>₹{{ b.total_amount|int }}</td>
+              <td><span class="status-badge status-{{ b.status }}">{{ b.status|capitalize }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <i class="fa fa-ticket-simple"></i>
+        <h3>No passes yet</h3>
+        <p>Book your first visitor pass to get started.</p>
+        <a href="{{ url_for('booking') }}" class="btn-solid">Book a Pass</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

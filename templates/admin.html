@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — VisitorPass Pro{% endblock %}
+{% block content %}
+
+<section class="dash-section">
+  <div class="dash-sidebar admin-sidebar">
+    <div class="ds-user">
+      <div class="ds-avatar admin-av"><i class="fa fa-user-shield"></i></div>
+      <h3>Admin Panel</h3>
+      <span class="ds-role">Administrator</span>
+    </div>
+    <nav class="ds-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="ds-link active"><i class="fa fa-chart-pie"></i> Overview</a>
+      <a href="{{ url_for('packages') }}"         class="ds-link"><i class="fa fa-box-open"></i> Packages</a>
+      <a href="{{ url_for('contact') }}"           class="ds-link"><i class="fa fa-envelope"></i> Messages</a>
+      <a href="{{ url_for('logout') }}"            class="ds-link logout"><i class="fa fa-right-from-bracket"></i> Logout</a>
+    </nav>
+  </div>
+
+  <div class="dash-main">
+    <div class="dash-top">
+      <div><h1>Admin Dashboard</h1><p>Manage all visitor bookings and system overview.</p></div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="dash-kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon blue"><i class="fa fa-users"></i></div>
+        <div class="kpi-info"><h2>{{ stats.users }}</h2><p>Registered Users</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon green"><i class="fa fa-ticket"></i></div>
+        <div class="kpi-info"><h2>{{ stats.bookings }}</h2><p>Total Bookings</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon amber"><i class="fa fa-hourglass-half"></i></div>
+        <div class="kpi-info"><h2>{{ stats.pending }}</h2><p>Pending Passes</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple"><i class="fa fa-indian-rupee-sign"></i></div>
+        <div class="kpi-info"><h2>₹{{ stats.revenue|int }}</h2><p>Total Revenue</p></div>
+      </div>
+    </div>
+
+    <!-- Bookings -->
+    <div class="dash-card">
+      <div class="dc-header">
+        <h2><i class="fa fa-list-check"></i> All Bookings</h2>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Pass Code</th><th>Visitor</th><th>Package</th><th>Visit Date</th><th>Amount</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            {% for b in bookings %}
+            <tr>
+              <td><span class="pass-code-badge">{{ b.pass_code }}</span></td>
+              <td>{{ b.user.name }}</td>
+              <td>{{ b.package.name }}</td>
+              <td>{{ b.visit_date.strftime('%d %b %Y') }}</td>
+              <td>₹{{ b.total_amount|int }}</td>
+              <td><span class="status-badge status-{{ b.status }}">{{ b.status|capitalize }}</span></td>
+              <td>
+                <form method="POST" action="{{ url_for('update_booking_status', bid=b.id) }}" style="display:flex;gap:4px">
+                  <select name="status" class="mini-select">
+                    {% for s in ['pending','approved','rejected','expired'] %}
+                    <option value="{{ s }}" {% if b.status==s %}selected{% endif %}>{{ s|capitalize }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="mini-btn"><i class="fa fa-check"></i></button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="dash-card">
+      <div class="dc-header"><h2><i class="fa fa-envelope"></i> Recent Messages</h2></div>
+      {% if messages %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for m in messages %}
+            <tr>
+              <td>{{ m.name }}</td>
+              <td>{{ m.email }}</td>
+              <td>{{ m.subject or '—' }}</td>
+              <td>{{ m.created_at.strftime('%d %b %Y') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="fa fa-inbox"></i><p>No messages yet.</p></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

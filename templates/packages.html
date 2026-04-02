@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Packages — VisitorPass Pro{% endblock %}
+{% block content %}
+
+<section class="page-hero">
+  <div class="page-hero-bg">
+    <div class="ph-orb ph-orb1"></div><div class="ph-orb ph-orb2"></div>
+  </div>
+  <div class="page-hero-content">
+    <div class="section-tag">Pass Packages</div>
+    <h1>Choose Your Ideal Pass</h1>
+    <p>Flexible packages for individuals, families and corporate teams.</p>
+  </div>
+</section>
+
+<section class="packages-section section-pad">
+  <div class="container">
+    <div class="pkg-grid">
+      {% for pkg in packages %}
+      <div class="pkg-card {% if loop.index == 3 %}featured{% endif %}">
+        {% if loop.index == 3 %}
+          <div class="pkg-badge">Most Popular</div>
+        {% endif %}
+        <div class="pkg-header">
+          <div class="pkg-icon">
+            <i class="fa {% if loop.index==1 %}fa-user{% elif loop.index==2 %}fa-users{% elif loop.index==3 %}fa-building{% else %}fa-crown{% endif %}"></i>
+          </div>
+          <h2>{{ pkg.name }}</h2>
+          <p>{{ pkg.description }}</p>
+        </div>
+        <div class="pkg-price">
+          <span class="currency">₹</span>
+          <span class="amount">{{ pkg.price|int }}</span>
+          <span class="per">/ {{ pkg.duration }}</span>
+        </div>
+        <div class="pkg-meta">
+          <span><i class="fa fa-users"></i> Up to {{ pkg.max_visitors }} visitor{% if pkg.max_visitors > 1 %}s{% endif %}</span>
+          <span><i class="fa fa-clock"></i> {{ pkg.duration }}</span>
+        </div>
+        <ul class="pkg-features">
+          {% for f in pkg.features.split(',') %}
+          <li><i class="fa fa-circle-check"></i> {{ f.strip() }}</li>
+          {% endfor %}
+        </ul>
+        <a href="{{ url_for('booking', pkg=pkg.id) }}" class="btn-pkg {% if loop.index==3 %}btn-pkg-accent{% endif %}">
+          Book This Pass <i class="fa fa-arrow-right"></i>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="compare-section section-pad dark-bg">
+  <div class="container">
+    <div class="section-header light">
+      <div class="section-tag">Comparison</div>
+      <h2>What's Included in Each Pass</h2>
+    </div>
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            {% for pkg in packages %}<th>{{ pkg.name }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% set all_features = ['Single Entry','Multiple Entry','Common Areas','Cafeteria Access','WiFi','Parking','Guided Tour','Conference Room','VIP Lounge','Concierge','Meals'] %}
+          {% for feat in all_features %}
+          <tr>
+            <td>{{ feat }}</td>
+            {% for pkg in packages %}
+            <td>
+              {% if feat in pkg.features %}
+                <i class="fa fa-circle-check check-yes"></i>
+              {% else %}
+                <i class="fa fa-circle-xmark check-no"></i>
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section section-pad">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">FAQs</div>
+      <h2>Frequently Asked Questions</h2>
+    </div>
+    <div class="faq-list">
+      {% set faqs = [
+        ('Can I upgrade my pass later?','Yes, you can contact our support team to upgrade your pass at any time.'),
+        ('Is group booking available?','Absolutely! Family and Corporate passes support multiple visitors under one booking.'),
+        ('What happens if I miss my visit date?','Please contact us 24 hours in advance to reschedule. Late cancellations may attract a fee.'),
+        ('Is the pass transferable?','Passes are personal and non-transferable. Each visitor requires their own unique pass.'),
+        ('How do I get my pass code?','After booking, your pass code appears on the dashboard and can be used at entry.'),
+      ] %}
+      {% for q, a in faqs %}
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">{{ q }}<i class="fa fa-chevron-down"></i></div>
+        <div class="faq-a">{{ a }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function toggleFaq(el) {
+  el.classList.toggle('open');
+}
+</script>
+{% endblock %}

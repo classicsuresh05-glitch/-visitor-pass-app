@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Register — VisitorPass Pro{% endblock %}
+{% block content %}
+<section class="auth-section">
+  <div class="auth-left">
+    <div class="auth-orb auth-orb1"></div>
+    <div class="auth-orb auth-orb2"></div>
+    <div class="auth-visual">
+      <div class="auth-pass-preview">
+        <div class="app-icon"><i class="fa-solid fa-id-badge"></i></div>
+        <h2>Create Your Account</h2>
+        <p>Join thousands of visitors who manage their passes digitally. It's free and takes less than a minute.</p>
+        <div class="auth-features">
+          <div class="af-item"><i class="fa fa-circle-check"></i> Free to register</div>
+          <div class="af-item"><i class="fa fa-circle-check"></i> Instant digital passes</div>
+          <div class="af-item"><i class="fa fa-circle-check"></i> Secure & encrypted</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <span class="brand-icon sm"><i class="fa-solid fa-id-badge"></i></span>
+        <span class="brand-text">Visitor<em>Pass</em></span>
+      </div>
+      <h1>Get Started</h1>
+      <p class="auth-sub">Already registered? <a href="{{ url_for('login') }}">Sign in here</a></p>
+      <form method="POST" action="{{ url_for('register') }}" class="auth-form">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label><i class="fa fa-user"></i> Full Name</label>
+            <input type="text" name="name" placeholder="Arjun Krishnan" required/>
+          </div>
+          <div class="form-group">
+            <label><i class="fa fa-phone"></i> Phone (optional)</label>
+            <input type="tel" name="phone" placeholder="+91 98765 43210"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label><i class="fa fa-envelope"></i> Email Address</label>
+          <input type="email" name="email" placeholder="you@example.com" required/>
+        </div>
+        <div class="form-group">
+          <label><i class="fa fa-lock"></i> Password</label>
+          <div class="pw-wrap">
+            <input type="password" name="password" id="pw" placeholder="Min 8 characters" required minlength="6"/>
+            <button type="button" class="pw-toggle" onclick="togglePw('pw',this)"><i class="fa fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="terms" required/>
+          <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+        </div>
+        <button type="submit" class="btn-auth">Create Account <i class="fa fa-arrow-right"></i></button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+function togglePw(id, btn) {
+  const el = document.getElementById(id);
+  el.type  = el.type === 'password' ? 'text' : 'password';
+  btn.innerHTML = `<i class="fa fa-eye${el.type==='text'?'-slash':''}"></i>`;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block title %}✈TravelPass Pro — Digital Visitor Management{% endblock %}
+{% block content %}
+
+<!-- ── HERO ──────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="grid-lines"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge"><i class="fa fa-shield-halved"></i> Trusted Digital Pass System</div>
+    <h1 class="hero-title">
+      Smart Visitor<br>
+      <span class="gradient-text">Pass Management</span>
+    </h1>
+    <p class="hero-sub">Issue, manage and verify digital visitor passes in seconds. Secure, paperless and professional — built for modern organisations.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('booking') }}" class="btn-primary-lg">
+        <i class="fa fa-calendar-plus"></i> Book a Pass
+      </a>
+      <a href="{{ url_for('packages') }}" class="btn-outline-lg">
+        View Packages <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+    <!-- Pass Verify Widget -->
+    <div class="verify-widget">
+      <p class="verify-label"><i class="fa fa-qrcode"></i> Quick Pass Verification</p>
+      <div class="verify-row">
+        <input type="text" id="passInput" placeholder="Enter Pass Code e.g. VP-ABC12345" maxlength="12"/>
+        <button onclick="verifyPass()"><i class="fa fa-magnifying-glass"></i> Verify</button>
+      </div>
+      <div id="verifyResult"></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="pass-card floating">
+      <div class="pass-header">
+        <span class="pass-logo"><i class="fa-solid fa-id-badge"></i> VisitorPass</span>
+        <span class="pass-chip">APPROVED</span>
+      </div>
+      <div class="pass-avatar"><i class="fa fa-user"></i></div>
+      <div class="pass-info">
+        <h3>Arjun Krishnan</h3>
+        <p>Corporate Pass · 3 Days</p>
+      </div>
+      <div class="pass-meta">
+        <div><label>Pass Code</label><span>VP-C7X2KP8R</span></div>
+        <div><label>Valid From</label><span>26 Mar 2024</span></div>
+      </div>
+      <div class="pass-barcode">
+        <div class="barcode-lines">
+          {% for i in range(30) %}<span></span>{% endfor %}
+        </div>
+        <span class="barcode-text">VP-C7X2KP8R</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ──────────────────────────────────────────────────────────── -->
+<section class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-num" data-count="{{ stats.total_visitors }}">0</span>
+      <span class="stat-lbl">Registered Visitors</span>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <span class="stat-num" data-count="{{ stats.total_bookings }}">0</span>
+      <span class="stat-lbl">Passes Booked</span>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <span class="stat-num" data-count="{{ stats.approved_passes }}">0</span>
+      <span class="stat-lbl">Approved Passes</span>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <span class="stat-num" data-count="{{ stats.packages_count }}">0</span>
+      <span class="stat-lbl">Pass Packages</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ───────────────────────────────────────────────────── -->
+<section class="how-section section-pad">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">How It Works</div>
+      <h2>Three Simple Steps</h2>
+      <p>From registration to entry — the entire process is digital, fast and secure.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card" style="--delay:.1s">
+        <div class="step-num">01</div>
+        <div class="step-icon"><i class="fa fa-user-plus"></i></div>
+        <h3>Register & Login</h3>
+        <p>Create your account in under a minute. Your data stays secure with us.</p>
+      </div>
+      <div class="step-connector"><i class="fa fa-arrow-right"></i></div>
+      <div class="step-card" style="--delay:.2s">
+        <div class="step-num">02</div>
+        <div class="step-icon"><i class="fa fa-box-open"></i></div>
+        <h3>Choose a Package</h3>
+        <p>Pick a pass package that suits your visit — day pass, family, corporate or VIP.</p>
+      </div>
+      <div class="step-connector"><i class="fa fa-arrow-right"></i></div>
+      <div class="step-card" style="--delay:.3s">
+        <div class="step-num">03</div>
+        <div class="step-icon"><i class="fa fa-id-card"></i></div>
+        <h3>Get Your Pass</h3>
+        <p>Receive your unique digital pass code instantly. Show it at entry — no printing needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ───────────────────────────────────────────────────────── -->
+<section class="features-section section-pad dark-bg">
+  <div class="container">
+    <div class="section-header light">
+      <div class="section-tag">Why Choose Us</div>
+      <h2>Built for Seamless Visitor Experiences</h2>
+    </div>
+    <div class="features-grid">
+      {% set features = [
+        ('fa-bolt','Instant Pass Generation','Generate verified passes in real-time with unique coded IDs.'),
+        ('fa-shield-halved','Secure & Encrypted','All visitor data is encrypted and stored securely.'),
+        ('fa-mobile-screen','Mobile Friendly','Access and present your pass from any device.'),
+        ('fa-clock-rotate-left','Visit History','Track all your past and upcoming visits in one place.'),
+        ('fa-users','Group Bookings','Book passes for teams or families with a single click.'),
+        ('fa-chart-line','Admin Analytics','Full admin dashboard with live stats and booking management.'),
+      ] %}
+      {% for icon, title, desc in features %}
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa {{ icon }}"></i></div>
+        <h3>{{ title }}</h3>
+        <p>{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-orb"></div>
+    <h2>Ready to Go Paperless?</h2>
+    <p>Join thousands of visitors who manage their passes digitally.</p>
+    <div class="cta-btns">
+      <a href="{{ url_for('register') }}" class="btn-primary-lg">Create Free Account</a>
+      <a href="{{ url_for('contact') }}"  class="btn-outline-lg inverted">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function verifyPass() {
+  const code = document.getElementById('passInput').value.trim().toUpperCase();
+  const res  = document.getElementById('verifyResult');
+  if (!code) { res.innerHTML = '<span class="vr-warn">Please enter a pass code.</span>'; return; }
+  res.innerHTML = '<span class="vr-loading"><i class="fa fa-spinner fa-spin"></i> Checking...</span>';
+  try {
+    const r = await fetch('/api/verify-pass', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({pass_code: code})
+    });
+    const d = await r.json();
+    if (d.valid) {
+      const cls = d.status === 'approved' ? 'vr-ok' : 'vr-warn';
+      res.innerHTML = `<div class="${cls}">
+        <i class="fa fa-${d.status==='approved'?'circle-check':'circle-xmark'}"></i>
+        <strong>${d.visitor}</strong> · ${d.package} · ${d.visit_date} · <em>${d.status.toUpperCase()}</em>
+      </div>`;
+    } else {
+      res.innerHTML = `<div class="vr-err"><i class="fa fa-triangle-exclamation"></i> ${d.message}</div>`;
+    }
+  } catch(e) {
+    res.innerHTML = '<div class="vr-err">Server error. Try again.</div>';
+  }
+}
+document.getElementById('passInput').addEventListener('keypress', e => { if(e.key==='Enter') verifyPass(); });
+
+// Animate counters
+const counters = document.querySelectorAll('.stat-num');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const target = +e.target.dataset.count;
+      let current  = 0;
+      const step   = Math.ceil(target / 50);
+      const t      = setInterval(() => {
+        current += step;
+        if (current >= target) { e.target.textContent = target; clearInterval(t); }
+        else e.target.textContent = current;
+      }, 30);
+      observer.unobserve(e.target);
+    }
+  });
+});
+counters.forEach(c => observer.observe(c));
+</script>
+{% endblock %}

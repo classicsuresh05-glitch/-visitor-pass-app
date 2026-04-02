@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}Book a Pass — VisitorPass Pro{% endblock %}
+{% block content %}
+
+<section class="page-hero">
+  <div class="page-hero-bg">
+    <div class="ph-orb ph-orb1"></div><div class="ph-orb ph-orb2"></div>
+  </div>
+  <div class="page-hero-content">
+    <div class="section-tag">Book a Pass</div>
+    <h1>Reserve Your Visitor Pass</h1>
+    <p>Fill in the details below and get your unique pass code instantly.</p>
+  </div>
+</section>
+
+<section class="booking-section section-pad">
+  <div class="container booking-layout">
+    <!-- ── FORM ── -->
+    <div class="booking-form-wrap">
+      <form method="POST" action="{{ url_for('booking') }}" id="bookingForm" class="booking-form">
+        <div class="form-section-title"><span>01</span> Select a Package</div>
+        <div class="pkg-selector-grid">
+          {% for pkg in packages %}
+          <label class="pkg-radio-card {% if preselect and preselect|int == pkg.id %}selected{% endif %}">
+            <input type="radio" name="package_id" value="{{ pkg.id }}"
+              {% if preselect and preselect|int == pkg.id %}checked{% elif loop.first and not preselect %}checked{% endif %}
+              onchange="updateSummary()"/>
+            <div class="prc-icon">
+              <i class="fa {% if loop.index==1 %}fa-user{% elif loop.index==2 %}fa-users{% elif loop.index==3 %}fa-building{% else %}fa-crown{% endif %}"></i>
+            </div>
+            <div class="prc-info">
+              <strong>{{ pkg.name }}</strong>
+              <span>₹{{ pkg.price|int }} · {{ pkg.duration }} · {{ pkg.max_visitors }} visitor{% if pkg.max_visitors > 1 %}s{% endif %}</span>
+            </div>
+            <div class="prc-check"><i class="fa fa-circle-check"></i></div>
+          </label>
+          {% endfor %}
+        </div>
+
+        <div class="form-section-title"><span>02</span> Visit Details</div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label><i class="fa fa-calendar"></i> Visit Date</label>
+            <input type="date" name="visit_date" id="visitDate" required
+              min="{{ now if now else '' }}" onchange="updateSummary()"/>
+          </div>
+          <div class="form-group">
+            <label><i class="fa fa-users"></i> Number of Visitors</label>
+            <input type="number" name="num_visitors" id="numVisitors" value="1" min="1" max="10"
+              required onchange="updateSummary()"/>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label><i class="fa fa-user-tie"></i> Host Name (optional)</label>
+            <input type="text" name="host_name" placeholder="Name of your host"/>
+          </div>
+          <div class="form-group">
+            <label><i class="fa fa-pen-line"></i> Purpose of Visit</label>
+            <input type="text" name="purpose" placeholder="e.g. Business Meeting, Interview"/>
+          </div>
+        </div>
+
+        <div class="form-section-title"><span>03</span> Confirm & Pay</div>
+        <div class="booking-summary" id="bookingSummary">
+          <div class="bs-row"><span>Package</span><strong id="bs-pkg">—</strong></div>
+          <div class="bs-row"><span>Duration</span><strong id="bs-dur">—</strong></div>
+          <div class="bs-row"><span>Visitors</span><strong id="bs-vis">1</strong></div>
+          <div class="bs-row"><span>Visit Date</span><strong id="bs-date">—</strong></div>
+          <div class="bs-divider"></div>
+          <div class="bs-row total"><span>Total Amount</span><strong id="bs-total">₹0</strong></div>
+        </div>
+
+        <button type="submit" class="btn-auth" id="submitBtn">
+          <i class="fa fa-id-card"></i> Confirm Booking & Get Pass
+        </button>
+      </form>
+    </div>
+
+    <!-- ── SIDEBAR ── -->
+    <div class="booking-sidebar">
+      <div class="sidebar-card">
+        <h3><i class="fa fa-circle-info"></i> How It Works</h3>
+        <ol class="sidebar-steps">
+          <li>Select a pass package</li>
+          <li>Fill in visit details</li>
+          <li>Click confirm — pass generated instantly</li>
+          <li>Show your pass code at entry</li>
+        </ol>
+      </div>
+      <div class="sidebar-card accent-card">
+        <h3><i class="fa fa-shield-halved"></i> Secure Booking</h3>
+        <p>Your pass code is unique and encrypted. Only authorised personnel can verify it.</p>
+      </div>
+      <div class="sidebar-card">
+        <h3><i class="fa fa-headset"></i> Need Help?</h3>
+        <p>Call us at <strong>+91 98765 43210</strong> or <a href="{{ url_for('contact') }}">send a message</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<script>
+const packages = {
+  {% for pkg in packages %}
+  {{ pkg.id }}: { name: "{{ pkg.name }}", price: {{ pkg.price }}, duration: "{{ pkg.duration }}" },
+  {% endfor %}
+};
+
+// Set min date to today
+document.getElementById('visitDate').min = new Date().toISOString().split('T')[0];
+
+function updateSummary() {
+  const sel  = document.querySelector('input[name="package_id"]:checked');
+  const date = document.getElementById('visitDate').value;
+  const num  = parseInt(document.getElementById('numVisitors').value) || 1;
+
+  // highlight selected card
+  document.querySelectorAll('.pkg-radio-card').forEach(c => c.classList.remove('selected'));
+  if (sel) sel.closest('.pkg-radio-card').classList.add('selected');
+
+  if (sel && packages[sel.value]) {
+    const pkg = packages[sel.value];
+    document.getElementById('bs-pkg').textContent   = pkg.name;
+    document.getElementById('bs-dur').textContent   = pkg.duration;
+    document.getElementById('bs-vis').textContent   = num;
+    document.getElementById('bs-date').textContent  = date ? new Date(date).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    document.getElementById('bs-total').textContent = '₹' + (pkg.price * num).toLocaleString('en-IN');
+  }
+}
+
+document.querySelectorAll('input[name="package_id"]').forEach(r => r.addEventListener('change', updateSummary));
+updateSummary();
+</script>
+{% endblock %}

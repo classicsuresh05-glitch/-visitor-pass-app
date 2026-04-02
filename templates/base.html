@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}VisitorPass Pro{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────────────────── -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="{{ url_for('index') }}" class="nav-brand">
+      <span class="brand-icon"><i class="fa-solid fa-id-badge"></i></span>
+      <span class="brand-text">Toll<em>Pass</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('index') }}"    class="nav-link {% if request.endpoint=='index'    %}active{% endif %}">Home</a></li>
+      <li><a href="{{ url_for('about') }}"    class="nav-link {% if request.endpoint=='about'    %}active{% endif %}">About</a></li>
+      <li><a href="{{ url_for('packages') }}" class="nav-link {% if request.endpoint=='packages' %}active{% endif %}">Packages</a></li>
+      <li><a href="{{ url_for('booking') }}"  class="nav-link {% if request.endpoint=='booking'  %}active{% endif %}">Book Pass</a></li>
+      <li><a href="{{ url_for('contact') }}"  class="nav-link {% if request.endpoint=='contact'  %}active{% endif %}">Contact</a></li>
+    </ul>
+    <div class="nav-auth">
+      {% if session.user_id %}
+        <a href="{{ url_for('dashboard') }}" class="btn-ghost"><i class="fa fa-grid-2"></i> Dashboard</a>
+        <a href="{{ url_for('logout') }}"    class="btn-solid">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}"    class="btn-ghost">Login</a>
+        <a href="{{ url_for('register') }}" class="btn-solid">Get Pass</a>
+      {% endif %}
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── FLASH ────────────────────────────────────────────── -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-wrap">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">
+          <i class="fa {% if cat=='success' %}fa-circle-check{% elif cat=='danger' %}fa-circle-xmark{% elif cat=='warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+          <span>{{ msg|safe }}</span>
+          <button class="flash-close" onclick="this.parentElement.remove()"><i class="fa fa-xmark"></i></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- ── PAGE ─────────────────────────────────────────────── -->
+<main>{% block content %}{% endblock %}</main>
+
+<!-- ── FOOTER ───────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="brand-icon"><i class="fa-solid fa-id-badge"></i></span>
+      <span class="brand-text">Visitor<em>Pass</em></span>
+      <p>Modernising visitor management with secure digital passes and seamless booking experiences.</p>
+      <div class="socials">
+        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a href="{{ url_for('about') }}">About Us</a></li>
+        <li><a href="{{ url_for('packages') }}">Packages</a></li>
+        <li><a href="{{ url_for('booking') }}">Book a Pass</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+        <li><a href="#">FAQs</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul class="contact-list">
+        <li><i class="fa fa-location-dot"></i> 123 Tech Park, Chennai, TN</li>
+        <li><i class="fa fa-phone"></i> +91 98765 43210</li>
+        <li><i class="fa fa-envelope"></i> hello@visitorpass.in</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2024 VisitorPass Pro. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
