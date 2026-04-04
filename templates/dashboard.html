@@ -63,7 +63,7 @@
           <thead>
             <tr>
               <th>Pass Code</th><th>Package</th><th>Visit Date</th>
-              <th>Visitors</th><th>Amount</th><th>Status</th>
+              <th>Visitors</th><th>Amount</th><th>Status</th><th>Download</th>
             </tr>
           </thead>
           <tbody>
@@ -75,6 +75,17 @@
               <td>{{ b.num_visitors }}</td>
               <td>₹{{ b.total_amount|int }}</td>
               <td><span class="status-badge status-{{ b.status }}">{{ b.status|capitalize }}</span></td>
+              <td>
+                {% if b.status == 'approved' %}
+                  <a href="{{ url_for('download_pass', bid=b.id) }}" class="btn-download" title="Download Pass PDF">
+                    <i class="fa fa-file-pdf"></i> PDF
+                  </a>
+                {% else %}
+                  <span class="btn-download disabled" title="Pass must be approved to download">
+                    <i class="fa fa-file-pdf"></i> PDF
+                  </span>
+                {% endif %}
+              </td>
             </tr>
             {% endfor %}
           </tbody>

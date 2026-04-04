@@ -14,24 +14,8 @@ if (navbar) {
 const hamburger = document.getElementById('hamburger');
 if (hamburger) {
   hamburger.addEventListener('click', () => {
-    const links = document.querySelector('.nav-links');
-    const auth  = document.querySelector('.nav-auth');
-    [links, auth].forEach(el => {
-      if (!el) return;
-      if (el.style.display === 'flex') {
-        el.style.display = '';
-      } else {
-        el.style.display   = 'flex';
-        el.style.flexDirection = 'column';
-        el.style.position  = 'absolute';
-        el.style.top       = 'var(--nav-h)';
-        el.style.left      = '0'; el.style.right = '0';
-        el.style.background= 'rgba(10,12,16,.98)';
-        el.style.padding   = '16px 24px';
-        el.style.zIndex    = '999';
-        el.style.borderBottom = '1px solid var(--border)';
-      }
-    });
+    document.getElementById('navbar').classList.toggle('menu-open');
+    hamburger.classList.toggle('active');
   });
 }
 

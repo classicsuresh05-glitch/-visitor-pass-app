@@ -1,14 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, date
+import werkzeug
 import os
 import random
 import string
+import io
+from fpdf import FPDF
 
 app = Flask(__name__)
 app.secret_key = 'visitor_pass_secret_key_2024'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/visitor_pass.db'
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'visitor_pass.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -91,7 +95,7 @@ def seed_admin():
         admin = User(
             name='Admin',
             email='admin@visitorpass.com',
-            password_hash=generate_password_hash('admin123'),
+            password_hash=generate_password_hash('admin123', method='pbkdf2:sha256'),
             role='admin'
         )
         db.session.add(admin)
@@ -163,7 +167,7 @@ def register():
             flash('Email already registered. Please login.', 'warning')
             return redirect(url_for('login'))
         user = User(name=name, email=email,
-                    password_hash=generate_password_hash(password), phone=phone)
+                    password_hash=generate_password_hash(password, method='pbkdf2:sha256'), phone=phone)
         db.session.add(user)
         db.session.commit()
         flash('Registration successful! Please login.', 'success')
@@ -245,6 +249,103 @@ def update_booking_status(bid):
     db.session.commit()
     flash('Booking status updated.', 'success')
     return redirect(url_for('admin_dashboard'))
+
+# ── Download Pass PDF ─────────────────────────────────────────────────────────
+
+@app.route('/download-pass/<int:bid>')
+def download_pass(bid):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    b = Booking.query.get_or_404(bid)
+    # Only the owner can download, and only approved passes
+    if b.user_id != session['user_id'] or b.status != 'approved':
+        flash('Pass is not available for download.', 'warning')
+        return redirect(url_for('dashboard'))
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    # ── Header background
+    pdf.set_fill_color(10, 12, 16)
+    pdf.rect(0, 0, 210, 60, 'F')
+    pdf.set_fill_color(0, 229, 195)
+    pdf.rect(0, 58, 210, 3, 'F')
+
+    # ── Title
+    pdf.set_text_color(0, 229, 195)
+    pdf.set_font('Helvetica', 'B', 24)
+    pdf.set_xy(0, 12)
+    pdf.cell(210, 12, 'VISITOR PASS', align='C')
+    pdf.set_font('Helvetica', '', 10)
+    pdf.set_text_color(180, 180, 200)
+    pdf.set_xy(0, 26)
+    pdf.cell(210, 8, 'GreenLand Digital Pass System', align='C')
+
+    # ── Pass Code
+    pdf.set_xy(0, 38)
+    pdf.set_font('Courier', 'B', 18)
+    pdf.set_text_color(255, 181, 71)
+    pdf.cell(210, 12, b.pass_code, align='C')
+
+    # ── Status badge
+    pdf.set_xy(75, 68)
+    pdf.set_fill_color(35, 196, 94)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font('Helvetica', 'B', 11)
+    pdf.cell(60, 10, 'APPROVED', align='C', fill=True)
+
+    # ── Details section
+    y = 90
+    pdf.set_draw_color(50, 55, 75)
+
+    details = [
+        ('Visitor Name', b.user.name),
+        ('Email', b.user.email),
+        ('Package', b.package.name),
+        ('Visit Date', b.visit_date.strftime('%d %B %Y')),
+        ('Number of Visitors', str(b.num_visitors)),
+        ('Purpose', b.purpose or 'General Visit'),
+        ('Host', b.host_name or 'Reception'),
+        ('Total Amount', f'Rs. {int(b.total_amount)}'),
+        ('Booking Date', b.created_at.strftime('%d %B %Y, %I:%M %p')),
+    ]
+
+    for label, value in details:
+        pdf.set_xy(20, y)
+        pdf.set_font('Helvetica', 'B', 10)
+        pdf.set_text_color(120, 120, 140)
+        pdf.cell(60, 8, label)
+        pdf.set_xy(82, y)
+        pdf.set_font('Helvetica', '', 11)
+        pdf.set_text_color(40, 40, 50)
+        pdf.cell(110, 8, value)
+        y += 12
+        pdf.set_draw_color(230, 230, 235)
+        pdf.line(20, y - 3, 190, y - 3)
+
+    # ── Footer note
+    y += 10
+    pdf.set_xy(20, y)
+    pdf.set_font('Helvetica', 'I', 9)
+    pdf.set_text_color(150, 150, 160)
+    pdf.multi_cell(170, 5, 'This is a digitally generated visitor pass. Please present this pass at the entrance gate. '
+                            'This pass is valid only for the date and number of visitors mentioned above.')
+
+    # ── Bottom bar
+    pdf.set_fill_color(10, 12, 16)
+    pdf.rect(0, 280, 210, 17, 'F')
+    pdf.set_xy(0, 283)
+    pdf.set_font('Helvetica', '', 8)
+    pdf.set_text_color(100, 100, 120)
+    pdf.cell(210, 6, 'GreenLand Visitor Pass System  |  www.visitorpass.in  |  +91 98765 43210', align='C')
+
+    # ── Output
+    pdf_bytes = pdf.output()
+    response = make_response(pdf_bytes)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=VisitorPass_{b.pass_code}.pdf'
+    return response
 
 # ── API: pass check ───────────────────────────────────────────────────────────
 
